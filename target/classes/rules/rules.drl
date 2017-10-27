@@ -1,0 +1,90 @@
+package rules;
+
+global java.lang.Double bMaluch;
+global java.lang.Double bFerrari;
+
+import com.example.testdrools.Kontrakt;
+
+
+// 1
+rule "reguła bazowa dla malucha"
+no-loop
+when
+	$kontrakt : Kontrakt ( name == "Maluch" )
+then
+	$kontrakt.setProwizja(bMaluch * 0.08);
+	update($kontrakt);
+end
+
+// 2
+rule "reguła bazowa dla ferrari"
+no-loop
+when
+	$kontrakt : Kontrakt ( name == "Ferrari" )
+then
+	$kontrakt.setProwizja(bFerrari * 0.04);
+	update($kontrakt);
+end
+
+// 3
+rule "prowizja za (150, 200) procent ceny dla Ferrari"
+no-loop
+when
+	$kontrakt : Kontrakt ( name == "Ferrari" && cena >= (1.5 * 1000) && cena < (2 * 1000))
+then
+	$kontrakt.setOpis( "kontrakt na ferrari za ponad 150%" );
+	$kontrakt.setProwizja(($kontrakt.getCena() - bFerrari) * 0.05);
+	retract($kontrakt);
+end
+
+rule "prowizja za [150, 200) procent ceny dla Malucha"
+no-loop
+when
+	$kontrakt : Kontrakt ( name == "Maluch" && (cena >= (1.5 * 100) && cena < (2 * 100)))
+then
+	$kontrakt.setOpis( "kontrakt na malucha za ponad 150%");
+	$kontrakt.setProwizja(($kontrakt.getCena() - bMaluch) * 0.05);
+	retract($kontrakt);
+end
+
+//4
+rule "prowizja za mniej niż 80 procent ceny dla Ferrari"
+no-loop
+when
+	$kontrakt : Kontrakt ( name == "Ferrari" && cena <= (0.8 * 1000))
+then
+	$kontrakt.setOpis( "kontrakt na ferrari za mniej niż 80%" );
+	$kontrakt.setProwizja(($kontrakt.getCena() - bFerrari) * 0.1);
+	retract($kontrakt);
+end
+
+rule "prowizja za mniej niż 80 procent ceny dla Malucha"
+no-loop
+when
+	$kontrakt : Kontrakt ( name == "Maluch" && cena <= (0.8 * 100) && cena > 0)
+then
+	$kontrakt.setOpis( "kontrakt na malucha za mniej niż 80%" );
+	$kontrakt.setProwizja(($kontrakt.getCena() - bMaluch) * 0.1);
+	retract($kontrakt);
+end
+
+// 5
+rule "prowizja za ponad 200 procent ceny dla Ferrari"
+no-loop
+when
+	$kontrakt : Kontrakt ( name == "Ferrari" && cena >= (2 * 1000))
+then
+	$kontrakt.setOpis( "kontrakt na ferrari za ponad 200%" );
+	$kontrakt.setProwizja(($kontrakt.getCena() - bFerrari) * 0.03);
+	retract($kontrakt);
+end
+
+rule "prowizja za ponad 200 procent ceny dla Malucha"
+no-loop
+when
+	$kontrakt : Kontrakt ( name == "Maluch" && (cena >= (2 * 100)))
+then
+	$kontrakt.setOpis( "kontrakt na malucha za ponad 200%");
+	$kontrakt.setProwizja(($kontrakt.getCena() - bMaluch) * 0.03);
+	retract($kontrakt);
+end
